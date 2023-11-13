@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Book a Timeslot{% endblock title %}
+
+{% block content %}
+    <h1>Book a Timeslot at {{ turf.name }}</h1>
+
+<form method="post" action="{% url 'book-turf' turf.id %}">
+
+    {% csrf_token %}
+    <input type="hidden" name="turf_id" value="{{ turf.id }}">
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Book Timeslot</button>
+</form>
+
+    
+    <a href="{% url 'turf-details' turf.id %}">Back to Turf Details</a>
+
+</div>
+{% endblock content %}

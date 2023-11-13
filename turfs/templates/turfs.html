@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    img {
+        width: 250px;
+        height: 250px;
+    }
+
+    .search-form {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .search-form input[type="text"] {
+        width: 300px;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .search-form button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #007BFF;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .search-form button:hover {
+        background-color: #0056b3;
+    }
+
+    .row-cols {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    /* Add this to your existing styles */
+.rating-stars {
+    font-size: 20px; /* Adjust the size as needed */
+    color: #ffc107; /* Star color (yellow) */
+}
+
+.filled {
+    color: #ffc107; /* Filled star color (yellow) */
+}
+
+
+    .col {
+        margin: 15px;
+    }
+
+    .card {
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        transition: box-shadow 0.3s;
+    }
+
+    .card:hover {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    .card-img-top {
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .fw-bolder {
+        font-weight: bold;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .btn-outline-dark {
+        background-color: transparent;
+        color: #343a40;
+        border: 2px solid #343a40;
+    }
+
+    .btn-outline-dark:hover {
+        background-color: #343a40;
+        color: #fff;
+    }
+</style>
+
+<section class="py-5">
+    <div class="container px-4 px-lg-5 mt-5">
+        <div class="search-form">
+            <form method="GET" action="{% url 'search_turfs' %}">
+                <input type="text" name="query" placeholder="Search by name or location">
+                <button type="submit">Search</button>
+            </form>
+        </div>
+        <div class="row row-cols gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+            {% for turf in turfs %}
+<div class="col">
+    <div class="card h-100">
+        <!-- Product image -->
+        <img class="card-img-top" src="{{ turf.image.url }}" alt="{{ turf.name }}">
+        <!-- Product details -->
+        <div class="card-body">
+            <div class="text-center">
+                <!-- Product name -->
+                <h5 class="fw-bolder">{{ turf.name }}</h5>
+                <!-- Product address -->
+                <p>{{ turf.location }}</p>
+                <!-- Product sports -->
+                <p>{{ turf.sports }}</p>
+                <!-- Product price -->
+                <p>Price: ${{ turf.price }}</p>
+                <!-- Average Rating as Stars -->
+                <!-- Average Rating as Stars -->
+<div class="average-rating">
+    <span class="rating-stars {% if turf.avg_rating >= 1 %}filled{% endif %}"></span>
+    <span class="rating-stars {% if turf.avg_rating >= 2 %}filled{% endif %}"></span>
+    <span class="rating-stars {% if turf.avg_rating >= 3 %}filled{% endif %}"></span>
+    <span class="rating-stars {% if turf.avg_rating >= 4 %}filled{% endif %}"></span>
+    <span class="rating-stars {% if turf.avg_rating >= 5 %}filled{% endif %}"></span>
+</div>
+
+            </div>
+        </div>
+        <!-- Product actions -->
+        <div class="card-footer">
+            <div class="text-center">
+                <a class="btn btn-outline-dark" href="{% url 'turf_details' turf.id %}">Book Now</a>
+            </div>
+        </div>
+    </div>
+</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,15 @@
+<!-- write_review.html -->
+{% extends "base.html" %}
+
+{% block title %}Write a Review{% endblock title %}
+
+{% block content %}
+    <h1>Write a Review for {{ turf.name }}</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Submit Review</button>
+    </form>
+</div>
+{% endblock content %}

@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+
+{% block title %}Turf Details{% endblock title %}
+
+{% block content %}
+    <!-- Header -->
+    <h1 class="turf-name">Turf Details: {{ turf.name }}</h1>
+
+    <!-- Turf Image Slider using Swiper -->
+    <div class="swiper-container">
+        <div class="swiper-wrapper">
+            {% for image in turf.turfimage_set.all %}
+                <div class="swiper-slide active">
+                    <div class="image-container">
+                        <img src="{{ image.image.url }}" alt="{{ turf.name }} Image" class="slider-image">
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Sports -->
+    <h2>Sports:</h2>
+    <div class="bordered-list">
+        {% for sport in turf.sports_set.all %}
+            <div class="bordered-list-item">{{ sport.sports }}</div>
+        {% endfor %}
+    </div>
+
+    <!-- Facilities -->
+    <h2>Facilities:</h2>
+    <div class="bordered-list">
+        {% for facility in turf.facilities_set.all %}
+            <div class="bordered-list-item">{{ facility.facilities }}</div>
+        {% endfor %}
+    </div>
+
+    <!-- Location -->
+    <div class="bordered-list">
+        <h3>Location:</h3>
+        <div class="bordered-list-item">{{ turf.location }}</div>
+    </div>
+
+    <!-- Price -->
+    <div class="bordered-list">
+        <h3>Price:</h3>
+        <div class="bordered-list-item">{{ turf.price }}</div>
+    </div>
+
+    <!-- Info -->
+    <div class="bordered-list">
+        <h3>Info:</h3>
+        <div class="bordered-list-item">{{ turf.info }}</div>
+    </div>
+
+    <!-- Contacts -->
+    <div class="bordered-list">
+        <h3>Contacts:</h3>
+        <div class="bordered-list-item">{{ turf.connect }}</div>
+    </div>
+
+    <!-- Calendar -->
+    <h2 class="calendar-header">Calendar</h2>
+    <div class="calendar">
+        <table>
+            <thead>
+                <tr>
+                    <th>Time-Slots</th>
+                    {% for day in days %}
+                        <th class="{% if day|date:"D jS" == today|date:"D jS" %}current-day{% endif %}">
+                            {{ day|date:"D jS" }}
+                        </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for timeslot in timeslot_data %}
+                    <tr>
+                        <td class="timeslot">{{ timeslot.timeslot|split_timeslot:'-'|join:" - " }}</td>
+                        {% for day, availability in timeslot.availability.items %}
+                            <td class="availability {% if request.user.is_authenticated %}{% if availability == 'available' %}available{% elif availability == 'inactive' %}inactive{% elif timeslot.selected and availability == 'unavailable' %}selected{% else %}unavailable{% endif %}{% else %}{% if availability == 'available' %}available{% elif availability == 'inactive' %}inactive{% else %}unavailable{% endif %}{% endif %}">
+                                {% if availability == 'available' %}Available{% elif availability == 'inactive' %}Inactive{% elif timeslot.selected and availability == 'unavailable' %}Selected{% else %}Booked{% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Booking Form -->
+    <div class="booking-form">
+        <h2>Book a Timeslot</h2>
+        <form method="post" action="{% url 'book-turf' turf.id %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Book Timeslot</button>
+        </form>
+    </div>
+
+    <!-- Reviews -->
+    <div class="reviews">
+        <p>Average Rating: {{ turf.average_rating }}</p>
+        <h2>Reviews:</h2>
+        <div class="paginator">
+            <ul class="review-list">
+                {% for review in reviews|slice:":5" %}
+                    <li class="review">
+                        <div class="rating">Rating: {{ review.rating }}</div>
+                        <div class="text">{{ review.review_text }}</div>
+                        <div class="user">Posted by: {{ review.user.username }}</div>
+                        <div class="date">Posted on: {{ review.date_posted }}</div>
+                        {% if request.user == review.user %}
+                            <div class="actions">
+                                <a href="{% url 'edit_review' review.id %}" class="edit-review">Edit</a>
+                                <a href="{% url 'confirm_delete_review' review.id %}" class="delete-review">Delete</a>
+                            </div>
+                        {% endif %}
+                    </li>
+                {% empty %}
+                    <p>No reviews available.</p>
+                {% endfor %}
+            </ul>
+            <!-- Pagination -->
+            <div class="pagination"></div>
+            <div class="write-review-button">
+                <a href="{% url 'write_review' turf.id %}" class="btn btn-primary">Write a Review</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.reviews {
+    margin-top: 20px;
+}
+
+.review-list {
+    list-style: none;
+    padding: 0;
+}
+
+.review {
+    border: 1px solid #ddd;
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.review .rating {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #007bff;
+}
+
+.review .text {
+    margin-top: 10px;
+}
+
+.review .user {
+    color: #555;
+}
+
+.review .date {
+    color: #777;
+    font-size: 0.9rem;
+}
+
+.no-reviews {
+    font-style: italic;
+    color: #777;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination-button {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 0 5px;
+    background-color: #007bff;
+    color: #fff;
+    border: 1px solid #007bff;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination-button:hover {
+    background-color: #0056b3;
+    color: #fff;
+}
+
+.pagination-button.active {
+    background-color: #0056b3;
+    border: 1px solid #0056b3;
+    color: #fff;
+}
+
+    .bordered-list {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .bordered-list-item {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 5px;
+        margin: 5px;
+    }
+
+    .bordered-list-item:hover {
+        background-color: #111111;
+        color: white;
+    }
+    .current-day {
+        background-color: blue;
+        color: white;
+    }
+
+    .calendar {
+        padding: 10px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        text-align: center;
+        padding: 10px;
+        border: 1px solid #ccc;
+    }
+
+    .timeslot {
+        font-weight: bold;
+    }
+
+    .availability {
+        cursor: pointer;
+    }
+
+    .available {
+        background-color: green;
+    }
+
+    .selected {
+        background-color: blue;
+    }
+
+    .unavailable {
+        background-color: red;
+    }
+
+    .inactive {
+        background-color: gray;
+    }
+
+    @media (max-width: 768px) {
+        .turf-name {
+            font-size: 20px;
+        }
+
+        .turf-info {
+            font-size: 14px;
+        }
+
+        .calendar-header {
+            font-size: 18px;
+        }
+
+        .timeslot {
+            font-size: 12px;
+        }
+    }
+
+    .swiper-container {
+        max-width: 600px;
+        margin: 20px auto;
+        overflow: hidden;
+    }
+
+    .swiper-slide {
+        display: none;
+    }
+
+    .swiper-slide.active {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .slider-image {
+        width: 100%;
+        height: 400px;
+    }
+
+    .swiper-button-next,
+    .swiper-button-prev {
+        color: #000;
+    }
+</style>
+
+
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script>
+    var mySwiper = new Swiper('.swiper-container', {
+        slidesPerView: 1,
+        spaceBetween: 20,
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+    });
+
+    document.querySelector('.swiper-slide:first-child').classList.add('active');
+</script>
+{% endblock content %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Booking Successful{% endblock title %}
+
+{% block content %}
+    <h1>Booking Successful</h1>
+    <p>Thank you, {{ user_name }}, for booking a timeslot.</p>
+    <p>You have successfully booked the following timeslot:</p>
+    <ul>
+        <li><strong>Timeslot:</strong> {{ timeslot }}</li>
+    </ul>
+    <p>You will receive a confirmation email shortly.</p>
+
+    <a href="{% url 'turf-details' timeslot.turf.id %}">Back to Turf Details</a>
+</div>
+{% endblock content %}
