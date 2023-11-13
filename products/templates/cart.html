@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Your Cart{% endblock title %}
+
+{% block content %}
+  <h1>Your Cart</h1>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Total</th>
+{#        <th>Actions</th>#}
+      </tr>
+    </thead>
+
+<tbody>
+  {% for item in open_order.orderproduct_set.all %}
+    <tr>
+      <td>{{ item.product.name }}</td>
+      <td>
+        <form method="post" action="{% url 'update_cart' item.id %}">
+          {% csrf_token %}
+          <input type="submit" name="decrease" value="-">
+          <input type="text" name="quantity" value="{{ item.quantity }}" min="1">
+          <input type="submit" name="increase" value="+">
+          <input type="submit" name="update" value="Update">
+          <input type="submit" name="remove" value="Remove">
+        </form>
+      </td>
+      <td>${{ item.product.price }}</td>
+      <td class="item-total">${{ item.item_total }}</td>
+{#      <td><a href="{% url 'remove_from_cart' item.id %}">Remove from Cart</a></td>#}
+    </tr>
+  {% endfor %}
+</tbody>
+<tfoot>
+  <tr>
+    <td colspan="3"><strong>Total Price:</strong></td>
+    <td class="total-price">${{ open_order.total_price }}</td>
+    <td></td>
+  </tr>
+</tfoot>
+
+<!-- ... (other HTML code) ... -->
+
+    </tbody>
+  </table>
+  <p>Total Price: $<span id="total-price">{{ open_order.total_price }}</span></p>
+  <a href="{% url 'checkout' %}" class="btn btn-primary">Checkout</a>
+</div>
+
+<script>
+  // Update the total price based on item totals
+  function updateTotalPrice() {
+    var total = 0;
+    $('.item-total').each(function() {
+      total += parseFloat($(this).text().replace('$', ''));
+    });
+    $('#total-price').text('$' + total.toFixed(2));
+  }
+
+  // Attach event handlers to quantity input elements
+  $('input[name="quantity"]').on('input', function() {
+    var form = $(this).closest('form');
+    form.submit(); // Submit the form when quantity changes
+  });
+
+  // Update the total price when the page loads and after each form submission
+  updateTotalPrice();
+  $('form').on('submit', function() {
+    updateTotalPrice();
+  });
+</script>
+{% endblock content %}

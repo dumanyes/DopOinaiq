@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+
+{% block title %}Product Details: {{ product.name }}{% endblock title %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-6">
+            <!-- Product Image Slider using Swiper -->
+            <div class="swiper-container">
+                <div class="swiper-wrapper">
+                    {% for image in product.productimage_set.all %}
+                        <div class="swiper-slide">
+                            <img src="{{ image.image.url }}" alt="{{ product.name }} Image" class="slider-image">
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h1 class="display-4">{{ product.name }}</h1>
+            <p class="lead">{{ product.location }}</p>
+            <p><strong>Price:</strong> ${{ product.price }}</p>
+            <p><strong>Info:</strong> {{ product.info }}</p>
+            <p><strong>Contacts:</strong> {{ product.connect }}</p>
+            <div class="mt-4">
+                <form method="post" action="{% url 'add_to_cart' product.id %}">
+                    {% csrf_token %}
+{#                    <div class="mb-3">#}
+{#                        <label for="quantity" class="form-label">Quantity:</label>#}
+{#                        <input type="number" name="quantity" id="quantity" class="form-control" value="1">#}
+{#                    </div>#}
+                    <button type="submit" class="btn btn-primary">Add to Cart</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{##}
+{#        <div class="reviews">#}
+{#        <p>Average Rating: {{ turf.average_rating }}</p>#}
+{#        <h2>Reviews:</h2>#}
+{#        <div class="paginator">#}
+{#            <ul class="review-list">#}
+{#                {% for review in reviews|slice:":5" %}#}
+{#                    <li class="review">#}
+{#                        <div class="rating">Rating: {{ review.rating }}</div>#}
+{#                        <div class="text">{{ review.review_text }}</div>#}
+{#                        <div class="user">Posted by: {{ review.user.username }}</div>#}
+{#                        <div class="date">Posted on: {{ review.date_posted }}</div>#}
+{#                        {% if request.user == review.user %}#}
+{#                            <div class="actions">#}
+{#                                <a href="{% url 'edit_review' review.id %}" class="edit_review">Edit</a>#}
+{#                                <a href="{% url 'confirm_delete_review' review.id %}" class="delete_review">Delete</a>#}
+{#                            </div>#}
+{#                        {% endif %}#}
+{#                    </li>#}
+{#                {% empty %}#}
+{#                    <p>No reviews available.</p>#}
+{#                {% endfor %}#}
+{#            </ul>#}
+{#            <!-- Pagination -->#}
+{#            <div class="pagination"></div>#}
+{#            <div class="write-review-button">#}
+{#                <a href="{% url 'write_review' product.id %}" class="btn btn-primary">Write a Review</a>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+</div>
+
+<style>
+.reviews {
+    margin-top: 20px;
+}
+
+.review-list {
+    list-style: none;
+    padding: 0;
+}
+
+.review {
+    border: 1px solid #ddd;
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.review .rating {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #007bff;
+}
+
+.review .text {
+    margin-top: 10px;
+}
+
+.review .user {
+    color: #555;
+}
+
+.review .date {
+    color: #777;
+    font-size: 0.9rem;
+}
+
+.no-reviews {
+    font-style: italic;
+    color: #777;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+    .swiper-container {
+        max-width: 600px;
+        margin: 20px auto;
+        overflow: hidden;
+    }
+
+    .swiper-slide {
+        display: none;
+    }
+
+    .swiper-slide.active {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .slider-image {
+        width: 100%;
+        height: 400px;
+    }
+
+    .swiper-button-next,
+    .swiper-button-prev {
+        color: #000;
+    }
+</style>
+
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script>
+    var mySwiper = new Swiper('.swiper-container', {
+        slidesPerView: 1,
+        spaceBetween: 20,
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+    });
+
+    document.querySelector('.swiper-slide:first-child').classList.add('active');
+</script>
+{% endblock %}
